@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crop-Wise Market Price Comparison and Selling Decision Log</title>
+  <meta name="description" content="Grower net-return market intelligence platform. Compare real cash-in-hand returns across mandis after freight, hamali, and deductions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <!-- Top Operational Banner -->
+  <div class="top-banner">
+    <div id="db-status-text">
+      🟢 <strong>Supabase Connected:</strong> PostgreSQL RLS Active
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span class="db-pill">🌾 Kisan Net Intelligence v1.0</span>
+      <span class="db-pill">⏰ 48h Freshness Threshold</span>
+    </div>
+  </div>
+
+  <!-- Main Navigation Bar -->
+  <header class="app-navbar">
+    <div class="nav-container">
+      <div class="brand-logo" data-nav-target="landing">
+        <div class="brand-icon">🌾</div>
+        <div>
+          <div class="brand-text">Kisan<span>Net</span> Intel</div>
+          <span class="brand-subtitle">Crop Market Comparison & Decision Log</span>
+        </div>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item active" data-view="landing">
+            <button data-nav-target="landing">🏡 Home</button>
+          </li>
+          <li class="nav-item" data-view="comparison">
+            <button data-nav-target="comparison">⚖️ Net Comparison</button>
+          </li>
+          <li class="nav-item" data-view="decisions">
+            <button data-nav-target="decisions">📋 Decision Log</button>
+          </li>
+          <li class="nav-item" data-view="quotes">
+            <button data-nav-target="quotes">📈 Market Quotes</button>
+          </li>
+          <li class="nav-item" data-view="charts">
+            <button data-nav-target="charts">📉 Price Trends</button>
+          </li>
+          <li class="nav-item" data-view="analytics">
+            <button data-nav-target="analytics">📊 Dashboard</button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Persona Selector (Role Switcher for Evaluation) -->
+      <div class="persona-switcher">
+        <span class="persona-label">Persona:</span>
+        <select id="global-persona-select" class="persona-select" title="Switch between Visitor, Farmer, Operator, or Admin persona">
+          <!-- Populated dynamically by app.js -->
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Views Container -->
+  <main class="main-content">
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 1: LANDING PAGE & STORY -->
+    <!-- ========================================================================= -->
+    <section id="view-landing" class="app-view active">
+      <div class="landing-hero">
+        <div class="hero-pill">
+          <span>🌱</span> Stop Relying on Raw Headline Prices
+        </div>
+        <h1 class="hero-title">
+          Growers Need <span>Net-Return</span> Comparisons, Not Distant Headline Numbers.
+        </h1>
+        <p class="hero-subtitle">
+          A ₹300/quintal higher headline quote at a distant terminal often becomes a loss after factoring in 800km diesel freight, APMC commissions, hamali, and refraction cuts. Compare real cash-in-hand return across mandis and log validated selling decisions.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" data-nav-target="comparison">
+            ⚖️ Launch Comparison Engine
+          </button>
+          <button class="btn btn-outline btn-lg" data-nav-target="decisions">
+            📋 View Selling Decision Log
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Market Pulse Ticker -->
+      <div class="market-ticker">
+        <div class="ticker-heading">
+          <span>🌾 Today's Mandi Market Pulse</span>
+          <span style="font-weight: 500; font-size: 0.75rem; color: var(--color-text-muted);">Real-time arrival benchmarks</span>
+        </div>
+        <div id="landing-pulse-container" class="ticker-items">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- The Headline Price Trap Infographic -->
+      <div class="trap-infographic">
+        <div class="trap-header">
+          <h3>⚠️ The "Headline Price Trap" Explained</h3>
+          <p>Consider a grower in Sehore with 65 quintals of Sharbati Wheat Grade A ready for sale:</p>
+        </div>
+        <div class="trap-grid">
+          <div class="trap-card deceptive">
+            <div class="trap-card-title">
+              <span>Azadpur Mandi (780 km away)</span>
+              <span class="badge badge-stale">Deceptive Headline</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--color-text-muted);">Headline Quote: ₹3,290 / Quintal</div>
+            <div class="trap-number bad">₹2,728.10 <span style="font-size: 0.9rem; font-weight: 500;">/ qtl real net</span></div>
+            <ul class="trap-breakdown-list">
+              <li><span>Gross Lot Revenue (65 qtl @ ₹3,290)</span> <strong>₹2,13,850</strong></li>
+              <li><span>Freight Transport (780 km @ ₹0.85/km/qtl)</span> <strong class="text-danger">-₹43,095</strong></li>
+              <li><span>APMC Commission (3%) + Cess (1.5%)</span> <strong class="text-danger">-₹9,623</strong></li>
+              <li><span>Hamali Labor + Gunny Bags</span> <strong class="text-danger">-₹2,990</strong></li>
+              <li><span>Total Deductions Paid</span> <strong class="text-danger">-₹55,708 (26%)</strong></li>
+              <li><span><strong>Final Realized Cash-in-Hand</strong></span> <strong style="color: var(--color-danger);">₹1,58,142</strong></li>
+            </ul>
+          </div>
+
+          <div class="trap-card smart">
+            <div class="trap-card-title">
+              <span>Indore APMC (85 km away)</span>
+              <span class="badge badge-winner">Smart Net Choice</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--color-text-muted);">Headline Quote: ₹2,980 / Quintal (-₹310 lower!)</div>
+            <div class="trap-number good">₹2,770.35 <span style="font-size: 0.9rem; font-weight: 500;">/ qtl real net</span></div>
+            <ul class="trap-breakdown-list">
+              <li><span>Gross Lot Revenue (65 qtl @ ₹2,980)</span> <strong>₹1,93,700</strong></li>
+              <li><span>Freight Transport (85 km @ ₹0.85/km/qtl)</span> <strong class="text-danger">-₹4,696</strong></li>
+              <li><span>APMC Commission (2%) + Cess (1%)</span> <strong class="text-danger">-₹5,811</strong></li>
+              <li><span>Hamali Labor + Bags</span> <strong class="text-danger">-₹2,470</strong></li>
+              <li><span>Total Deductions Paid</span> <strong class="text-danger">-₹13,627 (7%)</strong></li>
+              <li><span><strong>Final Realized Cash-in-Hand</strong></span> <strong style="color: var(--color-success);">₹1,80,073</strong></li>
+            </ul>
+          </div>
+        </div>
+        <div style="margin-top: 16px; padding: 12px; background: #F0FDF4; border-radius: var(--radius-sm); font-size: 0.9rem; color: #166534; font-weight: 600; text-align: center;">
+          💡 Result: Selling locally at Indore yielded <strong>+₹21,931 MORE net cash in hand</strong> than sending the truck to Azadpur, despite Azadpur boasting a headline quote ₹310 higher!
+        </div>
+      </div>
+
+      <!-- Interactive Instant Sandbox Calculator -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span style="font-size: 1.4rem;">🧮</span>
+            <h3>Instant Net-Return Sandbox</h3>
+          </div>
+          <span style="font-size: 0.85rem; color: var(--color-text-muted);">Test any lot without saving</span>
+        </div>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label" for="sandbox-vol">Lot Volume (Quintals)</label>
+            <input type="number" id="sandbox-vol" class="form-input" value="50" min="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sandbox-price">Headline Mandi Price (₹/Qtl)</label>
+            <input type="number" id="sandbox-price" class="form-input" value="2950" min="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sandbox-dist">Mandi Distance (km)</label>
+            <input type="number" id="sandbox-dist" class="form-input" value="120" min="1">
+          </div>
+        </div>
+        <button id="landing-test-calc-btn" class="btn btn-primary" style="margin-bottom: 16px;">
+          ⚡ Calculate Real Cash-in-Hand
+        </button>
+
+        <div class="comp-price-matrix">
+          <div>
+            <div class="comp-col-label">Gross Value</div>
+            <div id="sandbox-gross-res" class="comp-col-val">₹0.00</div>
+          </div>
+          <div>
+            <div class="comp-col-label">Est. Total Deductions</div>
+            <div id="sandbox-deductions-res" class="comp-col-val deduction-val">-₹0.00</div>
+          </div>
+          <div>
+            <div class="comp-col-label">Net Return</div>
+            <div id="sandbox-net-res" class="comp-col-val net-val">₹0.00</div>
+          </div>
+          <div>
+            <div class="comp-col-label">Net Price / Quintal</div>
+            <div id="sandbox-net-qtl-res" class="comp-col-val net-val">₹0.00/qtl</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Pillars -->
+      <div class="features-grid">
+        <div class="feature-box">
+          <div class="feature-icon-wrapper">⚖️</div>
+          <h4>Granular Cost Comparison</h4>
+          <p>Factor in distance freight, hamali loading/unloading, state mandi commission, cess, bagging, and quality refraction to compute net realization.</p>
+        </div>
+        <div class="feature-box">
+          <div class="feature-icon-wrapper">⏰</div>
+          <h4>Stale-Data Warnings</h4>
+          <p>Quotes older than 48 hours are automatically flagged to protect growers from dispatching consignments based on obsolete arrival data.</p>
+        </div>
+        <div class="feature-box">
+          <div class="feature-icon-wrapper">📋</div>
+          <h4>Selling Decision Log</h4>
+          <p>Log decisions, capture chosen rationale, track dispatch status, and reconcile actual realized auction payouts against estimates.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 2: NET-RETURN COMPARISON WORKSPACE -->
+    <!-- ========================================================================= -->
+    <section id="view-comparison" class="app-view">
+      <div class="view-header">
+        <h2><span>⚖️</span> Crop-Wise Net-Return Comparison Engine</h2>
+        <p class="view-subtitle">Select your crop and customize freight, labor, and commission parameters to find the highest realized net return.</p>
+      </div>
+
+      <div class="comparison-layout">
+        <!-- Sidebar Controls -->
+        <aside class="comparison-sidebar">
+          <div class="card">
+            <h3 style="margin-bottom: 14px; font-size: 1.1rem; color: var(--color-primary);">
+              🌾 Lot & Logistics Parameters
+            </h3>
+
+            <div class="form-group">
+              <label class="form-label" for="calc-crop-select">Select Crop</label>
+              <select id="calc-crop-select" class="form-select">
+                <!-- Dynamically loaded -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="calc-grade-select">Variety / Grade</label>
+              <select id="calc-grade-select" class="form-select">
+                <!-- Dynamically loaded -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="calc-volume-input">Lot Volume (Quintals)</label>
+              <input type="number" id="calc-volume-input" class="form-input" value="65" min="1" step="0.5">
+              <span class="form-hint">1 Quintal = 100 kg</span>
+            </div>
+
+            <div class="params-section-title">Logistics & Deductions</div>
+
+            <div class="form-group">
+              <label class="form-label" for="calc-transport-rate">Transport Rate (₹/km/qtl)</label>
+              <input type="number" id="calc-transport-rate" class="form-input" value="0.85" step="0.05" min="0">
+              <span class="form-hint">Standard regional tractor/truck freight</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="calc-handling-rate">Hamali / Labor (₹/qtl)</label>
+              <input type="number" id="calc-handling-rate" class="form-input" value="18.0" step="1" min="0">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="calc-commission-rate">Mandi Commission (%)</label>
+              <input type="number" id="calc-commission-rate" class="form-input" value="2.0" step="0.25" min="0" max="10">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="calc-cess-rate">Market Cess / Development (%)</label>
+              <input type="number" id="calc-cess-rate" class="form-input" value="1.0" step="0.25" min="0" max="5">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="calc-packaging-rate">Bagging / Packaging (₹/qtl)</label>
+              <input type="number" id="calc-packaging-rate" class="form-input" value="20.0" step="1" min="0">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="calc-quality-rate">Moisture / Quality Deduction (₹/qtl)</label>
+              <input type="number" id="calc-quality-rate" class="form-input" value="0.0" step="5" min="0">
+              <span class="form-hint">Refraction allowance</span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Comparison Results Display -->
+        <div id="comparison-results-container">
+          <!-- Populated dynamically by calculator.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 3: SAVED SELLING DECISION LOG -->
+    <!-- ========================================================================= -->
+    <section id="view-decisions" class="app-view">
+      <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2><span>📋</span> Grower's Selling Decision Log</h2>
+          <p class="view-subtitle">Review planned, dispatched, and realized sales records with full deduction audits.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="export-decisions-csv-btn" class="btn btn-outline btn-sm">
+            📥 Export CSV
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="UI.switchView('comparison')">
+            + New Decision from Comparison
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <label for="decision-status-filter" style="font-size: 0.875rem; font-weight: 600;">Status:</label>
+        <select id="decision-status-filter" class="form-select" style="max-width: 180px;">
+          <option value="">All Statuses</option>
+          <option value="Planned">Planned</option>
+          <option value="Dispatched">Dispatched</option>
+          <option value="Sold">Sold (Reconciled)</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <!-- Decision Items List -->
+      <div id="decisions-list-container" class="decisions-list">
+        <!-- Populated dynamically by decisions.js -->
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 4: MARKET QUOTES INTELLIGENCE -->
+    <!-- ========================================================================= -->
+    <section id="view-quotes" class="app-view">
+      <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2><span>📈</span> Dated Mandi Market Quotes</h2>
+          <p class="view-subtitle">Official APMC bulletins, direct procurement counters, and trader rates with freshness tracking.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="open-import-csv-btn" class="btn btn-outline btn-sm staff-only">
+            📤 Import CSV
+          </button>
+          <button id="export-quotes-csv-btn" class="btn btn-outline btn-sm">
+            📥 Export CSV
+          </button>
+          <button id="open-add-quote-btn" class="btn btn-primary btn-sm">
+            + Log New Quote
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-bar">
+        <select id="quotes-crop-filter" class="form-select" style="max-width: 200px;">
+          <option value="">All Crops</option>
+        </select>
+        <select id="quotes-market-filter" class="form-select" style="max-width: 200px;">
+          <option value="">All Mandis</option>
+        </select>
+        <select id="quotes-sort-select" class="form-select" style="max-width: 180px;">
+          <option value="price">Sort by Price (High to Low)</option>
+          <option value="market">Sort by Mandi Name</option>
+          <option value="crop">Sort by Crop Name</option>
+        </select>
+        <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.875rem; cursor: pointer;">
+          <input type="checkbox" id="quotes-stale-toggle">
+          <span>Show Stale Quotes (>48h) Only</span>
+        </label>
+      </div>
+
+      <!-- Quotes Table -->
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Crop & Grade</th>
+              <th>Market / Mandi</th>
+              <th>Modal Price (INR/Qtl)</th>
+              <th>Arrival Volume</th>
+              <th>Freshness</th>
+              <th>Source</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="quotes-table-body">
+            <!-- Populated dynamically by quotes.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 5: PRICE & NET-RETURN TRENDS (HISTORY CHART) -->
+    <!-- ========================================================================= -->
+    <section id="view-charts" class="app-view">
+      <div class="view-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2><span>📉</span> Historical Mandi Price & Net-Return Trends</h2>
+          <p class="view-subtitle">Interactive 14-day history comparing raw headline quotes (solid line) against realized net returns (dashed line).</p>
+        </div>
+        <div>
+          <select id="chart-crop-select" class="form-select" style="min-width: 240px;">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="chart-container">
+          <canvas id="price-history-canvas" class="chart-canvas"></canvas>
+        </div>
+        <div id="chart-legend" class="chart-legend">
+          <!-- Populated by charts.js -->
+        </div>
+        <div style="font-size: 0.8rem; color: var(--color-text-muted); text-align: center; margin-top: 12px;">
+          * Solid line represents official modal auction quote. Dashed line represents net realized return after standard distance freight, hamali, and cess.
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 6: OPERATIONAL DASHBOARD & METRICS -->
+    <!-- ========================================================================= -->
+    <section id="view-analytics" class="app-view">
+      <div class="view-header">
+        <h2><span>📊</span> Operational Metrics & Intelligence Dashboard</h2>
+        <p class="view-subtitle">Key performance indicators, trade volume realized, and deduction distributions.</p>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Decisions Logged</span>
+          <div id="metric-total-decisions" class="kpi-value">0</div>
+          <span class="kpi-subtext">Active selling strategies</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Volume Realized</span>
+          <div id="metric-volume-sold" class="kpi-value">0 Qtl</div>
+          <span class="kpi-subtext">Successfully auctioned</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Realized Net Cash</span>
+          <div id="metric-net-revenue" class="kpi-value">₹0.00</div>
+          <span class="kpi-subtext">Direct in-hand revenue</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Deductions Tracked</span>
+          <div id="metric-deductions-paid" class="kpi-value">₹0.00</div>
+          <span class="kpi-subtext">Freight & APMC fees</span>
+        </div>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3>⭐ Recommended Best-Net Mandis</h3>
+          </div>
+          <div id="analytics-recommendations-list">
+            <!-- Populated by app.js -->
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>⏰ Freshness & Stale Data Risk Summary</h3>
+          </div>
+          <p style="margin-bottom: 12px; font-size: 0.9rem;">
+            Stale quotes cause erroneous transit decisions. Our system continuously checks age against a 48-hour threshold.
+          </p>
+          <div style="background: #FFFBEB; border: 1px solid #FCD34D; padding: 14px; border-radius: var(--radius-sm); margin-bottom: 14px;">
+            <div style="font-size: 0.85rem; color: #92400E; font-weight: 700;">Active Stale Quotes Alert:</div>
+            <div style="font-size: 1.5rem; font-weight: 800; color: #B45309;" id="metric-stale-quotes">0</div>
+            <div style="font-size: 0.8rem; color: #92400E;">Require re-verification before road transit booking.</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="State.quoteFilters.stale_only = true; UI.switchView('quotes');">
+            Inspect All Stale Quotes
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODALS -->
+  <!-- ========================================================================= -->
+
+  <!-- 1. Save Decision Modal -->
+  <div id="save-decision-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>💾 Save Selling Decision to Log</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="save-decision-form">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Crop</label>
+            <input type="text" id="decision-modal-crop" class="form-input" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Chosen Target Market</label>
+            <input type="text" id="decision-modal-market" class="form-input" readonly>
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label">Volume (Quintals)</label>
+            <input type="text" id="decision-modal-volume" class="form-input" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Headline Quote</label>
+            <input type="text" id="decision-modal-headline" class="form-input" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total Deductions</label>
+            <input type="text" id="decision-modal-deductions" class="form-input" readonly>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Est. Net Price/Qtl</label>
+            <input type="text" id="decision-modal-net-price" class="form-input" readonly style="font-weight: 700; color: var(--color-primary);">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Est. Total Cash-in-Hand</label>
+            <input type="text" id="decision-modal-net-return" class="form-input" readonly style="font-weight: 700; color: var(--color-primary);">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="decision-modal-buyer">Target Trader / Buyer Name (Optional)</label>
+          <input type="text" id="decision-modal-buyer" class="form-input" placeholder="e.g. Mahalakshmi Agro or ITC Counter">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="decision-modal-rationale">Decision Rationale *</label>
+          <textarea id="decision-modal-rationale" class="form-textarea" rows="3" required placeholder="Explain why you picked this market (e.g. Higher net return despite freight)"></textarea>
+          <span class="form-hint">Mandatory for your decision journal review.</span>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-outline modal-close-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Confirm & Log Decision</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Reconcile Sale Modal -->
+  <div id="reconcile-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>💰 Reconcile & Close Sale Outcome</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="reconcile-sale-form">
+        <input type="hidden" id="reconcile-decision-id">
+        <p id="reconcile-crop-info" style="font-size: 0.95rem; margin-bottom: 14px; font-weight: 600; color: var(--color-primary);"></p>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="reconcile-realized-price">Actual Auction Price Realized (₹/Qtl) *</label>
+            <input type="number" id="reconcile-realized-price" class="form-input" required step="1" min="100">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reconcile-realized-deductions">Actual Total Deductions Paid (₹) *</label>
+            <input type="number" id="reconcile-realized-deductions" class="form-input" required step="1" min="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reconcile-buyer-name">Final Buyer / Shop Number</label>
+          <input type="text" id="reconcile-buyer-name" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reconcile-variance-notes">Post-Sale Reflections & Variance Notes</label>
+          <textarea id="reconcile-variance-notes" class="form-textarea" rows="3" placeholder="Note down any price adjustments, assay test surprises, or deductions variance."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-outline modal-close-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Reconcile & Realize Sale</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Add Quote Modal -->
+  <div id="add-quote-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>➕ Submit Mandi Market Quote</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="add-quote-form">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="new-quote-crop">Crop *</label>
+            <select id="new-quote-crop" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-quote-grade">Grade / Quality *</label>
+            <select id="new-quote-grade" class="form-select" required></select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="new-quote-market">Market / Mandi *</label>
+            <select id="new-quote-market" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-quote-date">Quote Date *</label>
+            <input type="date" id="new-quote-date" class="form-input" required>
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label" for="new-quote-min-price">Min Price (₹)</label>
+            <input type="number" id="new-quote-min-price" class="form-input" step="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-quote-modal-price">Modal Price (₹) *</label>
+            <input type="number" id="new-quote-modal-price" class="form-input" step="1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-quote-max-price">Max Price (₹)</label>
+            <input type="number" id="new-quote-max-price" class="form-input" step="1">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="new-quote-volume">Arrival Volume (Qtl)</label>
+            <input type="number" id="new-quote-volume" class="form-input" value="1000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-quote-source">Source *</label>
+            <input type="text" id="new-quote-source" class="form-input" value="APMC Daily Bulletin" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="new-quote-notes">Notes / Observations</label>
+          <input type="text" id="new-quote-notes" class="form-input" placeholder="e.g. Good buying interest, dry weather">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-outline modal-close-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Quote</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Import CSV Modal -->
+  <div id="import-csv-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📤 Import Mandi Quotes from CSV</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="import-csv-form">
+        <p style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: 12px;">
+          Paste CSV rows with headers <code>Crop, Market, Modal Price, Min Price, Max Price, Volume, Source, Date</code>:
+        </p>
+        <div class="form-group">
+          <textarea id="csv-import-textarea" class="form-textarea" rows="8" placeholder="Crop, Market, Modal Price, Min Price, Max Price, Volume, Source
+Sharbati Wheat, Indore Choithram Central Mandi, 3020, 2900, 3150, 5000, APMC Bulletin
+Yellow Soybean, Sehore Local APMC Yard, 4710, 4600, 4800, 1800, Local Register"></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-outline modal-close-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Validate & Import Rows</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Audit Trail Modal -->
+  <div id="audit-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📜 State Audit & Transition History</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div id="audit-trail-container">
+        <!-- Populated dynamically -->
+      </div>
+      <div style="text-align: right; margin-top: 20px;">
+        <button class="btn btn-outline modal-close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div>
+        <strong>Crop-Wise Market Price Comparison & Selling Decision Log</strong>
+        <p style="font-size: 0.8rem; margin-top: 4px; color: #94A3B8;">
+          Solving the Grower Net-Return Problem with Granular Deduction Modeling.
+        </p>
+      </div>
+      <div style="font-size: 0.8rem;">
+        Powered by Node.js, Express, Supabase PostgreSQL & Vanilla Web Platform.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/decisions.js"></script>
+  <script src="js/quotes.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
